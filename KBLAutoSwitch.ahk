@@ -51,6 +51,8 @@ Label_DefVar: ; 初始化变量
 	global LatestCheckDateTime
 	global Custom_Win_Group,Custom_Hotstring
 	global INI_CN,INI_CNEN,INI_EN
+	global _lastKbl
+	_lastKbl := 0
 
 Label_AdminLaunch: ; 管理员启动
 	iniread, Launch_Admin, %INI%, 基本设置, 管理员启动, 1
@@ -772,6 +774,19 @@ Label_Force:
 	; Sleep, 50
 	setIME(1,gl_Active_IMEwin_id)
 	SetTimer , Label_Force, Off
+	
+	gl_Active_IMEwin_id := getIMEwinid()
+	LastKBLCode := getIMEKBL(gl_Active_IMEwin_id)
+	if (_lastKbl==LastKBLCode) {
+		; intentionally leave blank 
+	} else {
+		if (LastKBLCode=CN_Code) {
+			立正2("中文输入法`n中文输入法`n中文输入法")
+		} else {
+			立正1("e`nn`ng`nl`ni`ns`nh`n")
+		}
+		_lastKbl := LastKBLCode
+	}
 Return
 
 ;-----------------------------------【输入法切换功能】-----------------------------------------------
@@ -2472,6 +2487,7 @@ Remove_From_All:
 	AddToKBLWin("","中文窗口,英文窗口,英文输入法窗口")
 Return
 
+;xxx
 Set_Chinese: ; 
 	消息("当前窗口设为中文" )
 	SetTimer , Label_Force, 100
@@ -2482,6 +2498,8 @@ Set_Chinese: ;
 	If (Enter_Inputing_Content_CnTo=1)
 		Gosub, Label_ToEnglishInputingOpera
 	setKBLlLayout(0)
+	; 立正(LastKBLCode)
+	sleep, 1000
 Return
 
 Set_ChineseEnglish:  
@@ -3189,6 +3207,27 @@ getCurPath(Cur_Style:="",CurSize:=1080,CurName:="") { ; 获取鼠标指针路径
 {
 	;Progress, %Width% b1 zh0 y10 fs18, %Message%,,%Title%,
 	;settimer, killAlert,%Timeout%
+	;sleep, 800
+}
+
+立正(Message)  
+{
+	Progress, w225 b1 zh0 x0 y0 fs18, %Message%,,%Title%,
+	settimer, killAlert,-500
+	;sleep, 800
+}
+
+立正1(Message)  
+{
+	Progress, w30 h190 x0 b1 zh0 fs18, %Message%,,%Title%,
+	settimer, killAlert,-590
+	;sleep, 800
+}
+
+立正2(Message)  
+{
+	Progress, w210 h80 x0 b1 zh0 fs18, %Message%,,%Title%,
+	settimer, killAlert,-590
 	;sleep, 800
 }
 
