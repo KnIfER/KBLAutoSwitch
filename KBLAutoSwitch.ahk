@@ -1,27 +1,26 @@
-﻿/*tong(【自动切换输入法】)
-	版本: v2.4.1
-	脚本: KBLAutoSwitch自动切换输入法
-	作者: tong
-*/
-
+﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+; #Warn  ; Enable warnings to assist with detecting common errors.
+SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+#MaxThreadsPerHotkey 2 
+#SingleInstance Force
 Label_ScriptSetting: ; 脚本前参数设置
-	Process, Priority, , Realtime					;脚本高优先级
-	#MenuMaskKey vkE8
-	#Persistent										;让脚本持久运行(关闭或ExitApp)
-	#SingleInstance Force							;允许多例运行，通过Single_Run限制单例
-	#WinActivateForce								;强制激活窗口
-	#MaxHotkeysPerInterval 2000						;时间内按热键最大次数
-	#HotkeyModifierTimeout 100						;按住modifier后(不用释放后再按一次)可隐藏多个当前激活窗口
-	SetBatchLines, -1								;脚本全速执行
-	SetControlDelay -1								;控件修改命令自动延时,-1无延时，0最小延时
-	CoordMode Menu Window							;坐标相对活动窗口
-	CoordMode Mouse Screen							;鼠标坐标相对于桌面(整个屏幕)
-	ListLines, Off									;不显示最近执行的脚本行
-	SendMode Input									;更速度和可靠方式发送键盘点击
-	SetTitleMatchMode 2								;窗口标题模糊匹配;RegEx正则匹配
-	DetectHiddenWindows on							;显示隐藏窗口
-	SetWorkingDir, %A_ScriptDir%
-
+	; Process, Priority, , Realtime					;脚本高优先级
+	; #MenuMaskKey vkE8
+	; #Persistent										;让脚本持久运行(关闭或ExitApp)
+	; #SingleInstance Force							;允许多例运行，通过Single_Run限制单例
+	; #WinActivateForce								;强制激活窗口
+	; #MaxHotkeysPerInterval 2000						;时间内按热键最大次数
+	; #HotkeyModifierTimeout 100						;按住modifier后(不用释放后再按一次)可隐藏多个当前激活窗口
+	; SetBatchLines, -1								;脚本全速执行
+	; SetControlDelay -1								;控件修改命令自动延时,-1无延时，0最小延时
+	; CoordMode Menu Window							;坐标相对活动窗口
+	; CoordMode Mouse Screen							;鼠标坐标相对于桌面(整个屏幕)
+	; ListLines, Off									;不显示最近执行的脚本行
+	; SendMode Input									;更速度和可靠方式发送键盘点击
+	; SetTitleMatchMode 2								;窗口标题模糊匹配;RegEx正则匹配
+	; DetectHiddenWindows on							;显示隐藏窗口
+	; SetWorkingDir, %A_ScriptDir%
 
 Label_DefVar: ; 初始化变量
 	global StartTick:=A_TickCount ; 启动开始时间
@@ -460,15 +459,6 @@ Label_NecessaryVar:	; 定义必要变量
 	global 启动时间 := A_YYYY "/" A_MM "/" A_DD "  " A_Hour ":" A_Min ":" A_Sec
 	global 权限 := A_IsAdmin=1?"管理员":"非管理员"
 	global 版本 := "v" APPVersion
-	global 启动时长 := 0
-	; 网络信息获取
-	global 最新版本 := "v0.0.0"
-	global 交流群 := "https://jq.qq.com/?_wv=1027&k=A3F0yfcy"
-	global 交流群信息 := "548517941【KBLAutoSwitch交流群】"
-	global 帮助文档 := "https://docs.qq.com/doc/DWHFxVXBNbWNxcWpa"
-	global 下载地址 := "https://wwr.lanzoui.com/b02i9dmsd"
-	global 下载地址提取码 := "fd5v"
-	global github地址 := "https://github.com/flyinclouds/KBLAutoSwitch"
 
 Label_DropDownListData: ; 下拉列表数据
 	global OnOffState := "禁止|开启"
@@ -586,6 +576,12 @@ Label_End: ; 收尾工作
 	SetTimer, Label_ClearMEM, -1000 ; 清理内存
 
 Label_Return: ; 结束标志
+	loop 
+	{	
+		WinGet, wid, ID, A
+		WinWaitNotActive, ahk_id %wid%
+		SetTimer , Label_Force, 100
+	}
 Return
 
 ;-----------------------------------【程序启动功能】-----------------------------------------------
@@ -607,24 +603,6 @@ Label_Change_TrayTip: ; 改变托盘图标提示
 Return
 
 Label_GetLatestAppInfo: ; 获取最新信息
-	try{
-		AppInfo := UrlDownloadToVar(AppInfoUrl)
-		Loop, parse, AppInfo, `n, `r  ; 在 `r 之前指定 `n, 这样可以同时支持对 Windows 和 Unix 文件的解析.
-		{
-			word_array := StrSplit(A_LoopField, ":",,2)
-			varName := word_array[1]
-			varValue := word_array[2]
-			try SetEnv, %varName%, %varValue%
-		}
-	}catch e {
-		最新版本 := "v0.0.0"
-	}
-	Gosub, Label_Change_TrayTip ; 更新托盘提示
-	If (AutoCheckOnceFlag=1){
-		AutoCheckOnceFlag := 0
-		If (AutoCheckUpdate!=0)
-			Gosub, Label_AutoCheckUpdate
-	}
 Return
 
 Label_AutoCheckUpdate: ; 自动检测更新提示
@@ -660,11 +638,6 @@ Label_Update_LatestCheckDateTime: ; 更新最后检查更新日期
 Return
 
 Label_Update_App: ; 更新App
-	If (更新地址!=""){
-		DownloadFile(更新地址,"KBLAutoSwitch.ahk",KBLTempFilePath,ahk文件大小)
-	}Else{
-		MsgBox,16,,下载失败，请检查网络！
-	}
 Return
 
 Label_ClearMEM: ; 清理内存
@@ -725,7 +698,13 @@ shellMessage(wParam, lParam) { ; 接受系统窗口回调消息切换输入法, 
 	}
 }
 
-Label_KBLSwitch_LastKBLState561: ; 英文输入法切换到中文输入法时
+; ^F1:: ; 重启脚本
+; 	Reload
+; return
+
+
+Label_KBLSwitch_LastKBLState561: 
+	消息("英文输入法切换到中文输入法时" )
 	If WinActive("ahk_group cn_ahk_group"){ ;切换中文输入法
 		setKBLlLayout(0,1)
 	}Else If WinActive("ahk_group cnen_ahk_group"){ ;切换英文(中文)输入法
@@ -738,6 +717,7 @@ Label_KBLSwitch_LastKBLState561: ; 英文输入法切换到中文输入法时
 Return
 
 Label_KBLSwitch_LastKBLState56: ; 中文输入法切换到中文输入法时
+	消息("中文输入法切换到中文输入法时" )
 	setKBLlLayout(LastKBLState56,1)
 Return
 
@@ -784,6 +764,15 @@ Label_SetTimer_ResetKBL: ; 定时重置输入法状态
 	}
 Return
 
+Label_Force:
+	If (Enter_Inputing_Content_CnTo=1)
+		Gosub, Label_ToEnglishInputingOpera
+	消息("Label_Force")
+	; SendMessage, 0x50, , %CN_Code%, , ahk_id %gl_Active_IMEwin_id%,,,,1000
+	; Sleep, 50
+	setIME(1,gl_Active_IMEwin_id)
+	SetTimer , Label_Force, Off
+Return
 
 ;-----------------------------------【输入法切换功能】-----------------------------------------------
 setKBLlLayout(KBL:=0,Source:=0) { ; 设置输入法键盘布局
@@ -800,28 +789,33 @@ setKBLlLayout(KBL:=0,Source:=0) { ; 设置输入法键盘布局
 			CapsLockState := Reset_CapsLock_State-1
 	}
 	LastKBLCode := getIMEKBL(gl_Active_IMEwin_id)
-	If (KBL=0){ ; 切换中文输入法
-		If (LastKBLCode=CN_Code){
-			setIME(1,gl_Active_IMEwin_id)
-		}Else{
-			SendMessage, 0x50, , %CN_Code%, , ahk_id %gl_Active_IMEwin_id%,,,,1000
-			Sleep,50
-			setIME(1,gl_Active_IMEwin_id)
-		}
-	}Else If (KBL=1){ ; 切换英文(中文)输入法
-		If (LastKBLCode=CN_Code){
-			setIME(0,gl_Active_IMEwin_id)
-		}Else{
-			SendMessage, 0x50, , %CN_Code%, , ahk_id %gl_Active_IMEwin_id%,,,,1000
-			Sleep,50
-			setIME(0,gl_Active_IMEwin_id)
-		}
-	}Else If (KBL=2){ ; 切换英文输入法
-		If (LastKBLCode!=EN_Code)
-			PostMessage, 0x50, , %EN_Code%, , ahk_id %gl_Active_IMEwin_id%
-	}
-	try showSwitch(KBL,CapsLockState,1)
-	SetTimer, Label_Change_TrayTip, -1000
+	
+	;SendMessage, 0x50, , %CN_Code%, , ahk_id %gl_Active_IMEwin_id%,,,,1000
+	;Sleep,50
+	
+	setIME(1,gl_Active_IMEwin_id)
+	; If (KBL=0){ ; 切换中文输入法
+	; 	If (LastKBLCode=CN_Code){
+	; 		setIME(1,gl_Active_IMEwin_id)
+	; 	}Else{
+	; 		SendMessage, 0x50, , %CN_Code%, , ahk_id %gl_Active_IMEwin_id%,,,,1000
+	; 		Sleep,50
+	; 		setIME(1,gl_Active_IMEwin_id)
+	; 	}
+	; } Else If (KBL=1){ ; 切换英文(中文)输入法
+	; 	If (LastKBLCode=CN_Code){
+	; 		setIME(0,gl_Active_IMEwin_id)
+	; 	}Else{
+	; 		SendMessage, 0x50, , %CN_Code%, , ahk_id %gl_Active_IMEwin_id%,,,,1000
+	; 		Sleep,50
+	; 		setIME(0,gl_Active_IMEwin_id)
+	; 	}
+	; } Else If (KBL=2){ ; 切换英文输入法
+	; 	If (LastKBLCode!=EN_Code)
+	; 		PostMessage, 0x50, , %EN_Code%, , ahk_id %gl_Active_IMEwin_id%
+	; }
+	;try showSwitch(KBL,CapsLockState,1)
+	;SetTimer, Label_Change_TrayTip, -1000
 }
 
 setIME(setSts, win_id:="") { ; 设置输入法状态-获取状态-末位设置
@@ -2473,33 +2467,41 @@ Add_To_En: ; 添加到英文输入法窗口
 	AddToKBLWin("英文输入法窗口","中文窗口,英文窗口,英文输入法窗口")
 Return
 
-Remove_From_All: ; 从配置窗口中移除，恢复为默认输入法
+Remove_From_All:
+	消息("从配置窗口中移除，恢复为默认输入法" )
 	AddToKBLWin("","中文窗口,英文窗口,英文输入法窗口")
 Return
 
-Set_Chinese: ; 当前窗口设为中文
-	If (TarHotFunFlag=0 && Outer_InputKey_Compatible=1 && A_ThisHotkey!="" && A_PriorKey!=RegExReplace(A_ThisHotkey, "iS)(~|\s|up|down)", ""))
+Set_Chinese: ; 
+	消息("当前窗口设为中文" )
+	SetTimer , Label_Force, 100
+	If (TarHotFunFlag=0 && Outer_InputKey_Compatible=1 
+			&& A_ThisHotkey!="" 
+			&& A_PriorKey!=RegExReplace(A_ThisHotkey, "iS)(~|\s|up|down)", ""))
 		Return
 	If (Enter_Inputing_Content_CnTo=1)
 		Gosub, Label_ToEnglishInputingOpera
 	setKBLlLayout(0)
 Return
 
-Set_ChineseEnglish: ; 当前窗口设为英文（中文输入法）
+Set_ChineseEnglish:  
+	消息("当前窗口设为英文（中文输入法）" )
 	If (TarHotFunFlag=0 && Outer_InputKey_Compatible=1 && A_ThisHotkey!="" && A_PriorKey!=RegExReplace(A_ThisHotkey, "iS)(~|\s|up|down)", ""))
 		Return
 	Gosub, Label_ToEnglishInputingOpera
 	setKBLlLayout(1)
 Return
 
-Set_English: ; 当前窗口设为英文
+Set_English:
+	消息("当前窗口设为英文" )
 	If (TarHotFunFlag=0 && Outer_InputKey_Compatible=1 && A_ThisHotkey!="" && A_PriorKey!=RegExReplace(A_ThisHotkey, "iS)(~|\s|up|down)", ""))
 		Return
 	Gosub, Label_ToEnglishInputingOpera
 	setKBLlLayout(2)
 Return
 
-Toggle_CN_CNEN: ; 切换中英文(中文)
+Toggle_CN_CNEN: ;
+	消息("切换中英文(中文)" )
 	If (TarHotFunFlag=0 && Outer_InputKey_Compatible=1 && A_ThisHotkey!="" && A_PriorKey!=RegExReplace(A_ThisHotkey, "iS)(~|\s|up|down)", ""))
 		Return
 	KBLState := (getIMEKBL(gl_Active_IMEwin_id)!=EN_Code?(getIMECode(gl_Active_IMEwin_id)!=0?0:1):2)
@@ -2510,7 +2512,8 @@ Toggle_CN_CNEN: ; 切换中英文(中文)
 		setKBLlLayout(0)
 Return
 
-Toggle_CN_EN: ; 切换中英文输入法
+Toggle_CN_EN:
+	消息("切换中英文输入法" )
 	If (TarHotFunFlag=0 && Outer_InputKey_Compatible=1 && A_ThisHotkey!="" && A_PriorKey!=RegExReplace(A_ThisHotkey, "iS)(~|\s|up|down)", ""))
 		Return
 	KBLState := (getIMEKBL(gl_Active_IMEwin_id)!=EN_Code?(getIMECode(gl_Active_IMEwin_id)!=0?0:1):2)
@@ -2524,21 +2527,25 @@ Toggle_CN_EN: ; 切换中英文输入法
 		setKBLlLayout(0)
 Return
 
-Display_KBL: ; 显示当前的输入法状态
+Display_KBL:
+	消息("显示当前的输入法状态" )
 	showSwitch(,,1)
 Return
 
-Reset_KBL: ; 重置当前输入法键盘布局
+Reset_KBL: 
+	消息("重置当前输入法键盘布局" )
 	If (TarHotFunFlag=0 && Outer_InputKey_Compatible=1 && A_ThisHotkey!="" && A_PriorKey!=RegExReplace(A_ThisHotkey, "iS)(~|\s|up|down)", ""))
 		Return
 	gosub, Label_Shell_KBLSwitch
 Return
 
-Stop_KBLAS: ; 停止输入法自动切换
+Stop_KBLAS: ; 
+	消息("停止输入法自动切换" )
 	gosub, Menu_Stop
 Return
 
-Get_KeyBoard: ; 手动检测键盘布局号码
+Get_KeyBoard: ; 
+	消息("手动检测键盘布局号码" )
 	InputLocaleID := Format("{1:#x}", getIMEKBL(gl_Active_IMEwin_id))
 	Clipboard := InputLocaleID
 	MsgBox, 键盘布局号码：%InputLocaleID%`n`n已复制到剪贴板
@@ -2701,6 +2708,7 @@ Return
 
 ;-----------------------------------【接收消息功能】-----------------------------------------------
 Receive_WM_COPYDATA(ByRef wParam,ByRef lParam) { ; 接收消息
+	消息("Receive_WM_COPYDATA 接收消息")
     StringAddress := NumGet(lParam + 2*A_PtrSize)  ; 获取 CopyDataStruct 的 lpData 成员.
     CopyOfData := StrGet(StringAddress)  ; 从结构中复制字符串.
     Remote_Dyna_Run(CopyOfData)
@@ -3175,3 +3183,21 @@ getCurPath(Cur_Style:="",CurSize:=1080,CurName:="") { ; 获取鼠标指针路径
     	CurPath := CurPath ".cur"
     Return CurPath
 }
+
+
+消息(Message,Width := "w450",Timeout := "-500", Title := "")  
+{
+	;Progress, %Width% b1 zh0 y10 fs18, %Message%,,%Title%,
+	;settimer, killAlert,%Timeout%
+	;sleep, 800
+}
+
+消息("adadad重载·123··" )
+
+F1::
+	Reload
+Return
+
+killAlert:
+progress,off
+return
