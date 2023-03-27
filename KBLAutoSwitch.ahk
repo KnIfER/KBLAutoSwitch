@@ -176,7 +176,7 @@ Label_ReadINI: ; 读取INI配置文件
 	iniread, Auto_Switch, %INI%, 基本设置, 自动切换, 1
 	iniread, Default_Keyboard, %INI%, 基本设置, 默认输入法, 1
 
-	iniread, TT_OnOff_Style, %INI%, 基本设置, 切换提示, 4
+	iniread, TT_OnOff_Style, %INI%, 基本设置, 切换提示, 0
 	iniread, TT_Display_Time, %INI%, 基本设置, 切换提示时间, 1500
 	iniread, TT_Font_Size, %INI%, 基本设置, 切换提示文字大小, 15,30
 	iniread, TT_Transparency, %INI%, 基本设置, 切换提示透明度, 235,180
@@ -187,7 +187,7 @@ Label_ReadINI: ; 读取INI配置文件
 	iniread, Tray_Double_Click, %INI%, 基本设置,托盘图标双击, 2
 	iniread, Tray_Display_KBL, %INI%, 基本设置,托盘图标显示输入法, 1
 	iniread, Tray_Display_Style, %INI%, 基本设置,托盘图标样式, 原版
-	iniread, Cur_Launch, %INI%, 基本设置,鼠标指针显示输入法, 1
+	iniread, Cur_Launch, %INI%, 基本设置,鼠标指针显示输入法, 0
 	iniread, Cur_Launch_Style, %INI%, 基本设置,鼠标指针样式, 原版
 	iniread, Cur_Size, %INI%, 基本设置,鼠标指针对应分辨率, 0
 
