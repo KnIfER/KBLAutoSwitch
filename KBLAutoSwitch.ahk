@@ -583,7 +583,20 @@ Label_Return: ; 结束标志
 		WinGet, wid, ID, A
 		WinWaitNotActive, ahk_id %wid%
 		SetTimer , Label_Force, 100
+		SetTimer , Label_Force, 200
 	}
+	~F1::
+		立正("adadad重载·123··" )
+		Reload
+	Return
+	; 这里根据你的快捷键，自定义之。
+	; 比如我的输入法切换快捷键是alt+shift，所以监听这两个键的释放。
+	~!LShift up::
+		SetTimer , Label_Force, 100
+	Return
+	~+LAlt up::
+		SetTimer , Label_Force, 100
+	Return
 Return
 
 ;-----------------------------------【程序启动功能】-----------------------------------------------
@@ -3205,9 +3218,9 @@ getCurPath(Cur_Style:="",CurSize:=1080,CurName:="") { ; 获取鼠标指针路径
 
 消息(Message,Width := "w450",Timeout := "-500", Title := "")  
 {
-	;Progress, %Width% b1 zh0 y10 fs18, %Message%,,%Title%,
-	;settimer, killAlert,%Timeout%
-	;sleep, 800
+	; Progress, %Width% b1 zh0 y10 fs18, %Message%,,%Title%,
+	; settimer, killAlert,%Timeout%
+	; sleep, 500
 }
 
 立正(Message)  
@@ -3230,12 +3243,6 @@ getCurPath(Cur_Style:="",CurSize:=1080,CurName:="") { ; 获取鼠标指针路径
 	settimer, killAlert,-590
 	;sleep, 800
 }
-
-消息("adadad重载·123··" )
-
-F1::
-	Reload
-Return
 
 killAlert:
 progress,off
