@@ -585,10 +585,6 @@ Label_Return: ; 结束标志
 		SetTimer , Label_Force, 100
 		SetTimer , Label_Force, 200
 	}
-	~F1::
-		立正("adadad重载·123··" )
-		Reload
-	Return
 	; 这里根据你的快捷键，自定义之。
 	; 比如我的输入法切换快捷键是alt+shift，所以监听这两个键的释放。
 	~!LShift up::
@@ -596,6 +592,16 @@ Label_Return: ; 结束标志
 	Return
 	~+LAlt up::
 		SetTimer , Label_Force, 100
+	Return
+	#IfWinActive ahk_exe Code.exe
+	~F1::
+		WinGetTitle,Title,A
+		StringGetPos, find, Title,KBLAutoSwitch.ahk
+		if(find = 0)
+		{
+			立正("重载·123··" )
+			Reload
+		}
 	Return
 Return
 
